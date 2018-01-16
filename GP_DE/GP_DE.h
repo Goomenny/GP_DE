@@ -41,7 +41,16 @@ private:
 	double meansquare; //Квадратичная ошибка
 
 					   //DE
-	double meanresult; //Среднее решение
+
+	double reliability = 0;
+	double meanresult = 0;
+	double meanx = 0;
+
+	double testreliability = 0;
+	double testmeanresult = 0;
+	double testmeanx = 0;
+
+	double testfitness;
 public:
 	TTree_DE();
 	~TTree_DE();
@@ -56,8 +65,28 @@ public:
 	inline double Get_result(double *); 	//Получить значение дерева через рекурсии регрессия
 
 											//DE
-	double Get_meanresult() { return meanresult; };
+	
 	void Set_fitness(double newfitness) { fitness = newfitness; };
+	double Get_testfitness() { return testfitness; };
+	void Set_testfitness(double arg) { testfitness = arg; };
+
+
+	double Get_reliability() { return reliability; };
+	double Get_meanresult() { return meanresult; };
+	double Get_meanx() { return meanx; };
+
+	double Get_testreliability() { return testreliability; };
+	double Get_testmeanresult() { return testmeanresult; };
+	double Get_testmeanx() { return testmeanx; };
+
+	void Set_reliability(double arg) { reliability= arg; };
+	void Set_meanresult(double arg) {  meanresult= arg; };
+	void Set_meanx(double arg) {  meanx= arg; };
+
+	void Set_testreliability(double arg) {  testreliability= arg; };
+	void Set_testmeanresult(double arg) {  testmeanresult= arg; };
+	void Set_testmeanx(double arg) {  testmeanx= arg; };
+
 
 };
 
@@ -65,8 +94,18 @@ class TPopulation_DE : public TPopulation<TTree_DE> {
 public:
 
 
-	void Calculate_fitness();
+	void Calculate_fitness(int runs);
 	string Get_tree_formula(int i) { return tree[i].Get_formula(); };
+	double Get_meanresult(int i) { return tree[i].Get_meanresult(); };
+	double Get_tree_testfitness(int i) { return tree[i].Get_testfitness(); };
+
+	double Get_tree_reliability(int i) { return tree[i].Get_reliability(); };
+	double Get_tree_meanresult(int i) { return tree[i].Get_meanresult(); };
+	double Get_tree_meanx(int i) { return tree[i].Get_meanx(); };
+
+	double Get_tree_testreliability(int i) { return tree[i].Get_testreliability(); };
+	double Get_tree_testmeanresult(int i) { return tree[i].Get_testmeanresult(); };
+	double Get_tree_testmeanx(int i) { return tree[i].Get_testmeanx(); };
 
 private:
 
@@ -81,6 +120,7 @@ public:
 	string Get_formula();
 	void Init(bool, int, int, int, int, int, int, int, int, int, double, int);  //Инициализация
 	double Get_value(double *);
+	double Get_bestmeanresult() { return last_population.Get_meanresult(0); };
 
 
 };

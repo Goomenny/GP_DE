@@ -1,6 +1,7 @@
 ﻿#include "GP_DE.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <fstream>
 TNode_DE::TNode_DE() {
 	unarvalue = NULL;
 	state = NULL;
@@ -92,7 +93,7 @@ void TNode_DE::Init(bool gtype, int gfunc, int gn_var, int inheriters) {
 
 	state = false;
 	type = gtype;
-	func = rand() % 4;
+	func = rand() % 3;
 	if (type)
 	{
 		if (func > 1) {
@@ -124,12 +125,13 @@ void TNode_DE::Init(bool gtype, int gfunc, int gn_var, int inheriters) {
 
 
 		constant = rand() % 2;
+		constant = false;
 		n_child = 0;
 		arn = 0;
 
 		if (constant) {
 
-			switch (rand()%5) {
+			switch (rand()%6) {
 			case 0:
 				value = 0;
 				break;
@@ -144,6 +146,9 @@ void TNode_DE::Init(bool gtype, int gfunc, int gn_var, int inheriters) {
 				break;
 			case 4:
 				value = M_E;
+				break;
+			case 5:
+				value = rand() % 20001 / 10000. - 1;
 				break;
 			}
 	
@@ -313,7 +318,7 @@ inline double TTree_DE::Get_result(double *gvar) {
 void TTree_DE::Mutate(int type_of_mutation, double probability_of_mutation) {
 	double ran = 0;
 	int last_func = 0;
-	int a[3] = { 0,1 }, b[2] = { 2,3 };
+	int a[3] = { 0,1 }, b[2] = { 2 };
 	switch (type_of_mutation) {
 	case 0:
 		probability_of_mutation = 1. / (5 * deep);
@@ -335,7 +340,7 @@ void TTree_DE::Mutate(int type_of_mutation, double probability_of_mutation) {
 				ran /= 100000.;
 				if (probability_of_mutation>ran) {
 
-					while (node[i][j].Get_func() == last_func) {
+					while (node[i][j].Get_func() == last_func&&last_func!=2) {
 						if (last_func <2) {
 							node[i][j].Set_func(a[rand() % 2]);
 						}
@@ -348,20 +353,58 @@ void TTree_DE::Mutate(int type_of_mutation, double probability_of_mutation) {
 					if (node[i][j].Get_func() == 2) node[i][j].Set_unarvalue(rand() % 20001 / 10000. - 1);
 				}
 			}
+			else {
+
+				if (node[i][j].Get_constant() ) {
+					switch (rand() % 6) {
+					case 0:
+						node[i][j].Set_value(0);
+						break;
+					case 1:
+						node[i][j].Set_value(0.5);
+						break;
+					case 2:
+						node[i][j].Set_value(1);
+						break;
+					case 3:
+						node[i][j].Set_value(M_PI);
+						break;
+					case 4:
+						node[i][j].Set_value(M_E);
+						break;
+					case 5:
+						node[i][j].Set_value(rand() % 20001 / 10000. - 1);
+						break;
+					}
+				}
+
+
+			}
 		}
 	}
 }
 //---------------------------------------------------------------------------
 
 
-void TPopulation_DE::Calculate_fitness() {
+void TPopulation_DE::Calculate_fitness(int runs) {
 
 
 #pragma omp parallel for
 	for (int i = 0; i < size_of_population; i++) {
 		TTest<TTree_DE> test;
-		test.Calculate(tree[i]);
-		tree[i].Set_fitness(1. / (1. + test.Get_meanx()));
+		test.Calculate(tree[i],runs,11);
+		//tree[i].Set_fitness( test.Get_reliability());
+		//tree[i].Set_testfitness(test.Get_testreliability());
+		tree[i].Set_fitness(1. / (1. + test.Get_meanresult()));
+		tree[i].Set_testfitness(1. / (1. + test.Get_testmeanresult()));
+
+		tree[i].Set_meanresult(test.Get_meanresult());
+		tree[i].Set_meanx(test.Get_meanx());
+		tree[i].Set_reliability(test.Get_reliability());
+
+		tree[i].Set_testmeanresult(test.Get_testmeanresult());
+		tree[i].Set_testmeanx(test.Get_testmeanx());
+		tree[i].Set_testreliability(test.Get_testreliability());
 	}
 #pragma omp barrier 
 }
@@ -426,6 +469,9 @@ string TGp_DE::Get_formula() {
 //---------------------------------------------------------------------------
 int TGp_DE::Start_fast(bool restart) {
 
+	ofstream fout;
+	
+
 	fitness.clear();
 
 	if (restart) {
@@ -445,7 +491,7 @@ int TGp_DE::Start_fast(bool restart) {
 
 	for (int i = 0; i < max_number_of_populations + 1; i++) {
 
-		last_population.Calculate_fitness();
+		last_population.Calculate_fitness(25);//10+5*(i/5));
 		last_population.Find_best();
 
 		tmp.clear();
@@ -457,13 +503,20 @@ int TGp_DE::Start_fast(bool restart) {
 		tmp.push_back(last_population.Get_best_fitness());
 		fitness.push_back(tmp);
 		
-		
+		fout.open("statistics.txt", ios_base::app);
 
 		for (int ind = 0; ind<size_of_population; ind++) {
-			cout<< last_population.Get_tree_fitness(ind) <<"\t"<< last_population.Get_tree_formula(ind) <<endl;
+			fout<< i << "\t" <<last_population.Get_tree_fitness(ind) <<"\t" << 
+				//last_population.Get_tree_testfitness(ind) << "\t" << 
+				last_population.Get_tree_meanresult(ind) << "\t" << 
+				//last_population.Get_tree_testmeanresult(ind) << "\t" << 
+				last_population.Get_tree_meanx(ind) << "\t" << 
+				//last_population.Get_tree_testmeanx(ind) << "\t" << 
+				last_population.Get_tree_reliability(ind) << "\t" << 
+				//last_population.Get_tree_testreliability(ind) << "\t" << 
+				last_population.Get_tree_formula(ind) <<endl;
 		}
-		cout << i << endl;
-		cout << "----" << endl;
+		fout.close();
 
 		if (last_population.Get_best_fitness() == 1 && found == false)
 		{

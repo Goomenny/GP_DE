@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <math.h>
-
+#include <fstream>
 
 
 #include <iostream>
@@ -13,6 +13,26 @@ using namespace std;
 
 int main() {
 	srand(time(NULL));
+	/*
+	TTree_DE tree;
+	tree.Init(4, 7, 1, 2);
+	TTest<TTree_DE> test;
+	ofstream fout;
+	for (int  i = 1; i < 11; i++)
+	{
+		test.Calculate(tree, 25, i);
+
+
+		fout.open("base_strat_statistics.txt", ios_base::app);
+		fout << test.Get_meanx() << endl;
+
+		fout.close();
+
+	}
+	*/
+
+
+
 	
 	TGp_DE gp;
 
@@ -20,13 +40,13 @@ int main() {
 	int n_var = 7;
 
 	int inheriters = 2;
-	int size_of_population = 10; //Размер популяции
+	int size_of_population = 100; //Размер популяции
 	int max_number_of_populations = 100;  //Макс число поколений
 	int type_of_selection = 1;  //Тип селекции      0=prop; 1=rang; 2=tour;
 	int size_of_tour = 5; //Размер турнира для турнирной селекции
 	int type_of_crossover = 0; //Тип скрещивания     0- стандартное 1-одноточечное
 	int type_of_mutation = 1;
-	int max_deep = 5;
+	int max_deep = 7;
 	int dimension = n_var;
 	int growth = 1; // 0- Полный рост 1- неполный
 	double probability_of_mutation = 5 / 100.;  //Вероятность мутации
@@ -52,6 +72,7 @@ int main() {
 
 	cout << gp.Get_formula() << endl;
 	cout << gp.Get_fitness() << endl;
+	cout << gp.Get_bestmeanresult() << endl;
 	cout << gp.Get_deep() << endl;
 	
 	/*

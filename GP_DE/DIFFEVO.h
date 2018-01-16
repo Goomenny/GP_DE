@@ -52,7 +52,7 @@ private:
 	
 
 public:
-	void Init(double(*evaluate)(double[], double *, int, long *), double *bias);
+	void Init(double(*evaluate)(double[], double *, int, long *), int g_strategy,  double *bias);
 	int CopyVector(double a[], double b[]);
 	int CopyArray(double dest[MAXPOP][MAXDIM], double src[MAXPOP][MAXDIM]);
 	
@@ -62,13 +62,13 @@ public:
 };
 
 template<class Tree>
-void TDE<Tree>::Init(double(*evaluate)(double[], double*, int, long *), double *bias)
+void TDE<Tree>::Init(double(*evaluate)(double[], double*, int, long *),int g_strategy ,double *bias)
 {
 
-	strategy = 11;     // choice of strategy
+	strategy = g_strategy;     // choice of strategy
 	genmax = 200;         // maximum number of generations
 	refresh = 50;        // output refresh cycle
-	D = 3;             // number of parameters
+	D = 5;             // number of parameters
 	NP = 50;             // population size.
 	inibound_h = 10.;     // upper parameter bound for init
 	inibound_l = -10.;     // lower parameter bound for init
@@ -352,9 +352,9 @@ double TDE<Tree>::Start_fast(double(*evaluate)(double[], double *, int, long *),
 					vars[5] = oldarray[r4][n];
 					vars[6] = oldarray[r5][n];
 					if ((urd(randeng) < CR) || L == (D - 1)) {
-						//tmp[n] = tree.Get_result(vars);
+						tmp[n] = tree.Get_result(vars);
 						//tmp[n] = tmp[n] + F*(bestit[n] - tmp[n]) + F*(oldarray[r1][n] - oldarray[r2][n]);
-						tmp[n] = (oldarray[r5][n]+0.5 - (oldarray[r1][n]- oldarray[r2][n]))-0.5; // на гриванке!
+						//tmp[n] = (oldarray[r5][n] - (oldarray[r1][n]- oldarray[r2][n])); // на гриванке!
 					}
 					n = (n + 1) % D;
 				}
