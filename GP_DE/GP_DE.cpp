@@ -93,10 +93,10 @@ void TNode_DE::Init(bool gtype, int gfunc, int gn_var, int inheriters) {
 
 	state = false;
 	type = gtype;
-	func = rand() % 3;
+	func = rand() % 5;
 	if (type)
 	{
-		if (func > 1) {
+		if (func == 2) {
 			n_child = 1; 
 			arn = 1;
 			
@@ -105,6 +105,16 @@ void TNode_DE::Init(bool gtype, int gfunc, int gn_var, int inheriters) {
 
 			unarvalue = rand() % 20001 / 10000. - 1;
 			
+		}
+		else if (func == 3 || func == 4) {
+			n_child = 3; //логические операции
+			arn = 3;
+
+
+			child = new int[n_child];
+
+			Set_symbol(func);
+
 		}
 		else {
 			n_child = 2; //Бинарное дерево
@@ -186,7 +196,10 @@ double TNode_DE::Get_result(double *gvar) {
 			value = unarvalue* argument[child[0]].Get_result(gvar);
 			break;
 		case 3:
-			value = sin(argument[child[0]].Get_result(gvar));
+			value = IfMore<TNode_DE>(argument, child, n_child, gvar);
+			break;
+		case 4:
+			value = IfEqualOrLess<TNode_DE>(argument, child, n_child, gvar);
 			break;
 		}
 	}
@@ -318,7 +331,7 @@ inline double TTree_DE::Get_result(double *gvar) {
 void TTree_DE::Mutate(int type_of_mutation, double probability_of_mutation) {
 	double ran = 0;
 	int last_func = 0;
-	int a[3] = { 0,1 }, b[2] = { 2 };
+	int a[3] = { 0,1 }, b[2] = { 2 }, c[2] = { 3,4 };
 	switch (type_of_mutation) {
 	case 0:
 		probability_of_mutation = 1. / (5 * deep);
@@ -344,8 +357,9 @@ void TTree_DE::Mutate(int type_of_mutation, double probability_of_mutation) {
 						if (last_func <2) {
 							node[i][j].Set_func(a[rand() % 2]);
 						}
-						else {
-							node[i][j].Set_func(b[rand() % 2]);
+						 
+						else if (last_func>2) {
+							node[i][j].Set_func(c[rand() % 2]);
 						}
 					}
 
