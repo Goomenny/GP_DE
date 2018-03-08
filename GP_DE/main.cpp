@@ -3,11 +3,9 @@
 #include <ctime>
 #include <math.h>
 #include <fstream>
-
-
 #include <iostream>
-
 #include "GP_DE.h"
+
 
 using namespace std;
 
@@ -33,7 +31,7 @@ int main() {
 
 
 
-	
+
 	TGp_DE gp;
 
 
@@ -41,18 +39,18 @@ int main() {
 
 	int inheriters = 3;
 	int size_of_population = 100; //Размер популяции
-	int max_number_of_populations = 20;  //Макс число поколений
-	int type_of_selection = 1;  //Тип селекции      0=prop; 1=rang; 2=tour;
+	int max_number_of_populations = 100;  //Макс число поколений
+	int type_of_selection = 2;  //Тип селекции      0=prop; 1=rang; 2=tour;
 	int size_of_tour = 5; //Размер турнира для турнирной селекции
-	int type_of_crossover = 0; //Тип скрещивания     0- стандартное 1-одноточечное
+	int type_of_crossover = 1; //Тип скрещивания     0- стандартное 1-одноточечное
 	int type_of_mutation = 1;
 	int max_deep = 7;
 	int dimension = n_var;
 	int growth = 1; // 0- Полный рост 1- неполный
 	double probability_of_mutation = 5 / 100.;  //Вероятность мутации
 	double accuracy = 0.05; //Точность поиска
-	bool selfconfiguration = true; // Самонастройка true/false
-	
+	bool selfconfiguration = false; // Самонастройка true/false
+
 	gp.Init(selfconfiguration, size_of_population, max_number_of_populations, type_of_selection, size_of_tour, type_of_crossover, max_deep, dimension, growth, type_of_mutation, probability_of_mutation, inheriters);
 
 	gp.Start_fast(false);
@@ -74,7 +72,7 @@ int main() {
 	cout << gp.Get_fitness() << endl;
 	cout << gp.Get_bestmeanresult() << endl;
 	cout << gp.Get_deep() << endl;
-	
+
 	/*
 	TTree_symbolic Tree[5];
 	for (int i = 0; i < 5; i++)
@@ -109,7 +107,7 @@ int main() {
 	cout << Tree.Get_formula() << endl << test.Get_meanresult() << endl << test.Get_reliability() << endl << test.Get_meanx() << endl;
 	*/
 	//regress();
-	
+
 	//Tree.Calculate_fitness();
 	//cout<< Tree.Get_formula()<<endl<<Tree.Get_fitness()<<endl;
 
@@ -118,7 +116,7 @@ int main() {
 	//double var[7]{ 0,1,1,3,4,5,6 };
 
 	//cout<<Tree.Get_result(var)<<endl;
-	
+
 	system("pause");
 	return 0;
 }

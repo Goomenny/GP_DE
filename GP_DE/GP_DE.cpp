@@ -2,6 +2,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <fstream>
+
 TNode_DE::TNode_DE() {
 	unarvalue = NULL;
 	state = NULL;
@@ -93,7 +94,7 @@ void TNode_DE::Init(bool gtype, int gfunc, int gn_var, int inheriters) {
 
 	state = false;
 	type = gtype;
-	func = rand() % 5;
+	func = rand() % 3;
 	if (type)
 	{
 		if (func == 2) {
@@ -398,8 +399,6 @@ void TTree_DE::Mutate(int type_of_mutation, double probability_of_mutation) {
 	}
 }
 //---------------------------------------------------------------------------
-
-
 void TPopulation_DE::Calculate_fitness(int runs) {
 
 
@@ -520,15 +519,17 @@ int TGp_DE::Start_fast(bool restart) {
 		fout.open("statistics.txt", ios_base::app);
 
 		for (int ind = 0; ind<size_of_population; ind++) {
-			fout<< i << "\t" <<last_population.Get_tree_fitness(ind) <<"\t" << 
-				//last_population.Get_tree_testfitness(ind) << "\t" << 
+			fout<< i << "\t" <<
+				last_population.Get_tree_reliability(ind) << "\t" <<
+				//last_population.Get_tree_testreliability(ind) << "\t" << 
+				last_population.Get_tree_meanx(ind) << "\t" <<
+				//last_population.Get_tree_testmeanx(ind) << "\t" << 
 				last_population.Get_tree_meanresult(ind) << "\t" << 
 				//last_population.Get_tree_testmeanresult(ind) << "\t" << 
-				last_population.Get_tree_meanx(ind) << "\t" << 
-				//last_population.Get_tree_testmeanx(ind) << "\t" << 
-				last_population.Get_tree_reliability(ind) << "\t" << 
-				//last_population.Get_tree_testreliability(ind) << "\t" << 
+				last_population.Get_tree_fitness(ind) << "\t" <<
+				//last_population.Get_tree_testfitness(ind) << "\t" << 
 				last_population.Get_tree_formula(ind) <<endl;
+
 		}
 		fout.close();
 

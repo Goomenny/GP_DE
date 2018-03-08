@@ -5,6 +5,46 @@
 #include "../../GP_Templates/TemplateGP.h"
 #include "Functions.h"
 
+struct Tree_fitness
+{
+	double reliability = 0;
+	double meanresult = 0;
+	double meanx = 0;
+
+	double testreliability = 0;
+	double testmeanresult = 0;
+	double testmeanx = 0;
+
+	double testfitness=0;
+	double fitness=0;
+
+	bool Tree_fitness::operator==(const Tree_fitness &other) const
+	{
+		if (&other == this) return true; // если сравнивается сам с собой
+
+		
+		if (reliability != other.reliability) return false;
+			else if (meanx != other.meanx) return false;
+				else if (meanresult != other.meanresult) return false;
+				
+
+		return true;
+	}
+
+	bool Tree_fitness::operator>(const Tree_fitness &other) const
+	{
+		if (&other == this) return false; // если сравнивается сам с собой
+
+
+		if (reliability < other.reliability) return false;
+		else if (meanx >  other.meanx && reliability == other.reliability) return false;
+		else if (meanresult > other.meanresult && meanx ==  other.meanx || meanresult == other.meanresult) return false;
+
+		return true;
+	}
+
+};
+
 class TNode_DE : public TNode
 {
 private:
@@ -51,6 +91,8 @@ private:
 	double testmeanx = 0;
 
 	double testfitness;
+
+	Tree_fitness grade;
 public:
 	TTree_DE();
 	~TTree_DE();
@@ -66,33 +108,35 @@ public:
 
 											//DE
 	
-	void Set_fitness(double newfitness) { fitness = newfitness; };
-	double Get_testfitness() { return testfitness; };
-	void Set_testfitness(double arg) { testfitness = arg; };
+	Tree_fitness Get_grade() { return grade; };
+
+	double Get_fitness() { return grade.fitness; };
+	void Set_fitness(double newfitness) { grade.fitness = newfitness; };
+	double Get_testfitness() { return grade.testfitness; };
+	void Set_testfitness(double arg) { grade.testfitness = arg; };
 
 
-	double Get_reliability() { return reliability; };
-	double Get_meanresult() { return meanresult; };
-	double Get_meanx() { return meanx; };
+	double Get_reliability() { return grade.reliability; };
+	double Get_meanresult() { return grade.meanresult; };
+	double Get_meanx() { return grade.meanx; };
 
-	double Get_testreliability() { return testreliability; };
-	double Get_testmeanresult() { return testmeanresult; };
-	double Get_testmeanx() { return testmeanx; };
+	double Get_testreliability() { return grade.testreliability; };
+	double Get_testmeanresult() { return grade.testmeanresult; };
+	double Get_testmeanx() { return grade.testmeanx; };
 
-	void Set_reliability(double arg) { reliability= arg; };
-	void Set_meanresult(double arg) {  meanresult= arg; };
-	void Set_meanx(double arg) {  meanx= arg; };
+	void Set_reliability(double arg) { grade.reliability= arg; };
+	void Set_meanresult(double arg) { grade.meanresult= arg; };
+	void Set_meanx(double arg) { grade.meanx= arg; };
 
-	void Set_testreliability(double arg) {  testreliability= arg; };
-	void Set_testmeanresult(double arg) {  testmeanresult= arg; };
-	void Set_testmeanx(double arg) {  testmeanx= arg; };
+	void Set_testreliability(double arg) { grade.testreliability= arg; };
+	void Set_testmeanresult(double arg) { grade.testmeanresult= arg; };
+	void Set_testmeanx(double arg) { grade.testmeanx= arg; };
 
 
 };
 
 class TPopulation_DE : public TPopulation<TTree_DE> {
 public:
-
 
 	void Calculate_fitness(int runs);
 	string Get_tree_formula(int i) { return tree[i].Get_formula(); };
@@ -106,6 +150,7 @@ public:
 	double Get_tree_testreliability(int i) { return tree[i].Get_testreliability(); };
 	double Get_tree_testmeanresult(int i) { return tree[i].Get_testmeanresult(); };
 	double Get_tree_testmeanx(int i) { return tree[i].Get_testmeanx(); };
+
 
 private:
 
